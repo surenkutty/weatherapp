@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:weatherapp/weather_model.dart';
 import 'package:weatherapp/weather_services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:weatherapp/widgets/progressBar.dart';
 
 class WeatherScreen extends StatefulWidget {
   @override
@@ -65,7 +66,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   Widget _buildCurrentWeatherWidget(WeatherData weatherData) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           weatherData.city,
@@ -95,14 +96,42 @@ class _WeatherScreenState extends State<WeatherScreen> {
           style: TextStyle(fontSize: 18.0),
         ),
         SizedBox(height: 8),
+
         Text(
           'Wind Speed: ${weatherData.windSpeed} m/s',
           style: TextStyle(fontSize: 16),
         ),
-        Text(
-          'Humidity: ${weatherData.humidity} %', // Display humidity
-          style: TextStyle(fontSize: 16),
-        ),
+        Container(
+          // padding: EdgeInsets.only(top: 10, bottom: 5),
+          height: 140,
+          width: 130,
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFF000000),
+                width: 1.0,
+                style: BorderStyle.solid,
+              ),
+              borderRadius: BorderRadius.circular(8)),
+          child: Column(
+            children: [
+              Text(
+                'Humidity:', // Display humidity
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                ' ${weatherData.humidity} %', // Display humidity
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              if (weatherData != null) ...[
+                // Text('Humidity'),
+                HumidityProgressBar(humidity: weatherData!.humidity),
+              ],
+            ],
+          ),
+        )
       ],
     );
   }
