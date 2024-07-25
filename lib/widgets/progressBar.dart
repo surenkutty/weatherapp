@@ -15,8 +15,8 @@ class HumidityProgressBar extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 70,
-                height: 70,
+                width: 50,
+                height: 50,
                 child: CircularProgressIndicator(
                   value: humidity / 100, // Convert humidity to progress value
                   strokeWidth:

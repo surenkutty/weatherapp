@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:weatherapp/weather_model.dart';
-// import 'package:weatherapp/weather_model.dart';
+import 'weather_model.dart';
 
 class WeatherApi {
   final String apiKey =
@@ -9,57 +8,79 @@ class WeatherApi {
 
   Future<WeatherData> fetchWeather(String city) async {
     try {
+      // Fetch current weather data
       final response = await http.get(Uri.parse(
-          'https://api.openweathermap.org/data/2.5/forecast?q=$city&appid=$apiKey'));
+          'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final cityName = data['city']['name'];
-        final icon = data['list'][0]['weather'][0]['icon'];
-        final temp = data['list'][0]['main']['temp'] - 273.15;
-        final maxTemp = data['list'][0]['main']['temp_max'] - 273.15;
-        final minTemp = data['list'][0]['main']['temp_min'] - 273.15;
-        final windSpeed = data['list'][0]['wind']['speed'];
-        final description = data['list'][0]['weather'][0]['description'];
+        print('Current Weather Data: $data'); // Debug print
 
-        final humidity = data['list'][0]['main']['humidity'];
-        print(humidity);
-        print(description);
-        final List<ForecastData> forecast = [];
-        for (var i = 0; i < data['list'].length; i += 8) {
-          final item = data['list'][i];
-          final date = DateTime.fromMillisecondsSinceEpoch(item['dt'] * 1000,
-              isUtc: false);
-          final maxTemp = item['main']['temp_max'] - 273.15;
-          final minTemp = item['main']['temp_min'] - 273.15;
-          final icon = item['weather'][0]['icon'];
+        // Fetch forecast data
+        final forecastResponse = await http.get(Uri.parse(
+            'https://api.openweathermap.org/data/2.5/forecast?q=$city&appid=$apiKey'));
 
-          forecast.add(ForecastData(
-            date: date,
+        if (forecastResponse.statusCode == 200) {
+          final forecastData = json.decode(forecastResponse.body)['list'];
+          print('Forecast Data: $forecastData'); // Debug print
+          List<ForecastData> forecast = [];
+
+          for (var item in forecastData) {
+            final date = DateTime.fromMillisecondsSinceEpoch(item['dt'] * 1000);
+            final maxTemp =
+                (item['main']['temp_max'] as num).toDouble() - 273.15;
+            final minTemp =
+                (item['main']['temp_min'] as num).toDouble() - 273.15;
+            final icon = item['weather'][0]['icon'];
+            final description = item['weather'][0]['description'];
+
+            forecast.add(ForecastData(
+              date: date,
+              maxTemperature: maxTemp,
+              minTemperature: minTemp,
+              icon: icon,
+              description: description,
+            ));
+          }
+
+          final cityName = data['name'];
+          final icon = data['weather'][0]['icon'];
+          final temp = (data['main']['temp'] as num).toDouble() - 273.15;
+          final maxTemp = (data['main']['temp_max'] as num).toDouble() - 273.15;
+          final minTemp = (data['main']['temp_min'] as num).toDouble() - 273.15;
+          final windSpeed = (data['wind']['speed'] as num).toDouble();
+          final description = data['weather'][0]['description'];
+          final humidity = data['main']['humidity'] as int;
+          final pressure = (data['main']['pressure'] as num).toDouble();
+          final realFeel =
+              (data['main']['feels_like'] as num).toDouble() - 273.15;
+          final sunrise = DateTime.fromMillisecondsSinceEpoch(
+              data['sys']['sunrise'] * 1000);
+
+          return WeatherData(
+            city: cityName,
+            icon: icon,
+            temperature: temp,
             maxTemperature: maxTemp,
             minTemperature: minTemp,
-            icon: icon,
-            // description: description,
-            description: item['weather'][0]['description'],
-          ));
+            windSpeed: windSpeed,
+            description: description,
+            humidity: humidity,
+            pressure: pressure,
+            realFeel: realFeel,
+            sunrise: sunrise,
+            forecast: forecast,
+          );
+        } else {
+          throw Exception(
+              'Failed to load forecast data. Status code: ${forecastResponse.statusCode}');
         }
-
-        return WeatherData(
-          city: cityName,
-          icon: icon,
-          temperature: temp,
-          maxTemperature: maxTemp,
-          minTemperature: minTemp,
-          windSpeed: windSpeed,
-          description: description,
-          humidity: humidity,
-          forecast: forecast,
-        );
       } else {
         throw Exception(
             'Failed to load weather data. Status code: ${response.statusCode}');
       }
     } catch (e) {
+      print('Error fetching weather data: $e'); // Debug print
       throw Exception('Error fetching weather data: $e');
     }
   }

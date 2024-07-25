@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:weatherapp/weather_model.dart';
 import 'package:weatherapp/weather_services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:weatherapp/widgets/cprogressbar.dart';
 import 'package:weatherapp/widgets/progressBar.dart';
 
 class WeatherScreen extends StatefulWidget {
@@ -45,7 +46,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
             if (weatherData != null) ...[
               _buildCurrentWeatherWidget(weatherData!),
               SizedBox(height: 20.0),
-              _buildForecastWidget(weatherData!.forecast),
+              _buildForecastWidget(
+                  weatherData!.forecast), // Display forecast widget
             ],
           ],
         ),
@@ -80,11 +82,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
           height: 100,
           width: 100,
         ),
-        // Image.network(
-        //   'https://openweathermap.org/img/w/${weatherData.icon}.png',
-        //   height: 100,
-        //   width: 100,
-        // ),
         SizedBox(height: 10.0),
         Text(
           '${weatherData.temperature.toStringAsFixed(1)}°C',
@@ -96,42 +93,49 @@ class _WeatherScreenState extends State<WeatherScreen> {
           style: TextStyle(fontSize: 18.0),
         ),
         SizedBox(height: 8),
-
         Text(
           'Wind Speed: ${weatherData.windSpeed} m/s',
           style: TextStyle(fontSize: 16),
         ),
+        SizedBox(height: 8),
+        SizedBox(
+          height: 8,
+        ),
         Container(
-          // padding: EdgeInsets.only(top: 10, bottom: 5),
-          height: 140,
+          height: 130,
           width: 130,
           decoration: BoxDecoration(
-              border: Border.all(
-                color: const Color(0xFF000000),
-                width: 1.0,
-                style: BorderStyle.solid,
-              ),
+              border: Border.all(color: Colors.black),
+              // border: Border.all(),
               borderRadius: BorderRadius.circular(8)),
-          child: Column(
-            children: [
-              Text(
-                'Humidity:', // Display humidity
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                ' ${weatherData.humidity} %', // Display humidity
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              if (weatherData != null) ...[
-                // Text('Humidity'),
-                HumidityProgressBar(humidity: weatherData!.humidity),
-              ],
-            ],
-          ),
-        )
+          child: HumidityProgressBar(humidity: weatherData.humidity),
+        ),
+
+        Text(
+          'Pressure: ${weatherData.pressure} hPa',
+          style: TextStyle(fontSize: 16),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Real Feel: ${weatherData.realFeel.toStringAsFixed(1)}°C',
+          style: TextStyle(fontSize: 16),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Sunrise: ${DateFormat('HH:mm').format(weatherData.sunrise)}',
+          style: TextStyle(fontSize: 16),
+        ),
+        PressureCircularProgress(pressure: weatherData.pressure),
+        SizedBox(height: 10),
+
+        // Display real feel circular progress
+        RealFeelCircularProgress(realFeel: weatherData.realFeel),
+        SizedBox(height: 10),
+        // SizedBox(height: 8),
+        // Text(
+        //   'Humidity: ${weatherData.humidity}%',
+        //   style: TextStyle(fontSize: 16),
+        // ),
       ],
     );
   }
@@ -212,6 +216,26 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   String _mapIconCode(String iconcode) {
     switch (iconcode) {
       case '01d':
@@ -255,25 +279,5 @@ class _WeatherScreenState extends State<WeatherScreen> {
       default:
         return 'default_icon'; // Use a default icon for unknown conditions
     }
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
