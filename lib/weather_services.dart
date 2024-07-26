@@ -80,7 +80,7 @@ class WeatherApi {
             'Failed to load weather data. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching weather data: $e'); // Debug print
+      // print('Error fetching weather data: $e');
       throw Exception('Error fetching weather data: $e');
     }
   }

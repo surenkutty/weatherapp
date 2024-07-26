@@ -57,11 +57,12 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
+        backgroundColor: Colors.blue,
         resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: Text('Weather App'),
-        ),
+        // appBar: AppBar(
+        //   backgroundColor: Colors.blue,
+        //   title: Text('Weather App'),
+        // ),
         body: _pages[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,

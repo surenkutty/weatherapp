@@ -12,86 +12,86 @@ class WeatherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Main weather container
           Container(
-            margin: const EdgeInsets.all(16.0),
+            height: 600,
+            margin: const EdgeInsets.only(top: 70),
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
-              // borderRadius: BorderRadius.circular(16.0),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.grey.withOpacity(0.5),
-              //     spreadRadius: 5,
-              //     blurRadius: 7,
-              //     offset: Offset(0, 3),
-              //   ),
-              // ],
+              color: Colors.blue,
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // City Name
+                // City Name with Location Icon
+                Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.white, size: 32),
+                    SizedBox(width: 8.0),
+                    Text(
+                      weatherData.city,
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.0),
+                // Date and Time
                 Text(
-                  weatherData.city,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  DateFormat('EEEE, MMM d, y - h:mm a').format(DateTime.now()),
+                  style: TextStyle(fontSize: 14, color: Colors.black),
                 ),
                 SizedBox(height: 16.0),
-                SizedBox(height: 10.0),
-                SvgPicture.asset(
-                  'assets/icons/${_mapIconCode(weatherData.icon)}.svg',
-                  // 'assets/icons/rainDay.svg',
-                  semanticsLabel: 'Weather Icon',
-                  height: 100,
-                  width: 100,
+                Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/${_mapIconCode(weatherData.icon)}.svg',
+                    semanticsLabel: 'Weather Icon',
+                    height: 200,
+                    width: 200,
+                  ),
                 ),
-
-                // Weather Image
-                // Image.network(
-                //   'http://openweathermap.org/img/wn/${weatherData.icon}.png',
-                //   height: 100,
-                //   width: 100,
-                // ),
                 SizedBox(height: 16.0),
-
                 // Temperature
                 Text(
                   '${weatherData.temperature.toStringAsFixed(1)}°C',
-                  style: TextStyle(fontSize: 24),
+                  style: TextStyle(fontSize: 24, color: Colors.white),
                 ),
                 SizedBox(height: 8.0),
-
                 // Weather Description
                 Text(
                   weatherData.description,
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 SizedBox(height: 16.0),
-
                 // Small Containers with Icons
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: [
-                    _buildInfoCard(Icons.wind_power, 'Wind Speed',
-                        '${weatherData.windSpeed} m/s'),
-                    _buildInfoCard(
-                        Icons.opacity, 'Humidity', '${weatherData.humidity}%'),
-                    _buildInfoCard(
-                        Icons.speed, 'Pressure', '${weatherData.pressure} hPa'),
-                    _buildInfoCard(Icons.ac_unit, 'Feels Like',
-                        '${weatherData.realFeel.toStringAsFixed(1)}°C'),
-                    _buildInfoCard(
-                        Icons.sunny,
-                        'Sunrise',
-                        DateFormat('h:mm a')
-                            .format(weatherData.sunrise.toLocal())),
-                  ],
+                SizedBox(
+                  height: 140,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildInfoCard(Icons.wind_power, 'Wind Speed',
+                          '${weatherData.windSpeed} m/s'),
+                      _buildInfoCard(Icons.opacity, 'Humidity',
+                          '${weatherData.humidity}%'),
+                      _buildInfoCard(Icons.speed, 'Pressure',
+                          '${weatherData.pressure} hPa'),
+                      _buildInfoCard(Icons.thermostat, 'Feels Like',
+                          '${weatherData.realFeel.toStringAsFixed(1)}°C'),
+                      _buildInfoCard(
+                          Icons.wb_sunny,
+                          'Sunrise',
+                          DateFormat('h:mm a')
+                              .format(weatherData.sunrise.toLocal())),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-
           // Forecast section (Swipeable)
           Container(
             margin: const EdgeInsets.all(16.0),
@@ -116,10 +116,9 @@ class WeatherScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16.0),
-
                 // Swipeable Forecast Data
                 Container(
-                  height: 200, // Adjust height as needed
+                  height: 200,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: weatherData.forecast.length,
@@ -151,18 +150,12 @@ class WeatherScreen extends StatelessWidget {
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 8.0),
-
                             SvgPicture.asset(
                               'assets/icons/${_mapIconCode(forecast.icon)}.svg',
                               semanticsLabel: 'Weather Icon',
                               height: 50,
                               width: 50,
                             ),
-                            // Image.network(
-                            //   'http://openweathermap.org/img/wn/${forecast.icon}.png',
-                            //   height: 50,
-                            //   width: 50,
-                            // ),
                             SizedBox(height: 8.0),
                             Text(
                               '${forecast.maxTemperature.toStringAsFixed(1)}°C / ${forecast.minTemperature.toStringAsFixed(1)}°C',
@@ -190,9 +183,10 @@ class WeatherScreen extends StatelessWidget {
 
   Widget _buildInfoCard(IconData icon, String title, String value) {
     return Container(
-      width: 80, // Uniform width
-      height: 110, // Uniform height
-      margin: const EdgeInsets.all(4.0),
+      width: 120, // Uniform width
+      height: 120, // Uniform height
+      margin: const EdgeInsets.symmetric(
+          horizontal: 4.0), // Reduced margin for better spacing
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.blue[50],
@@ -204,7 +198,7 @@ class WeatherScreen extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 24,
+            size: 28,
             color: Colors.blue,
           ),
           SizedBox(height: 8.0),
@@ -262,10 +256,8 @@ class WeatherScreen extends StatelessWidget {
         return 'mistDay';
       case '50n':
         return 'mistNight';
-
-      // Add more cases for other weather conditions as needed
       default:
-        return 'default_icon'; // Use a default icon for unknown conditions
+        return 'default_icon';
     }
   }
 }
